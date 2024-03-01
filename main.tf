@@ -12,7 +12,7 @@ resource "aws_vpc" "project_vpc" {
 resource "aws_subnet" "public_subnet" {
   vpc_id            = aws_vpc.project_vpc.id
   cidr_block        = var.subnet_cidr_block
-  availability_zone = "us-east-2a"
+  availability_zone = "us-east-1a"
   map_public_ip_on_launch = true
 
   tags = {
