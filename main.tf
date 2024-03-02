@@ -85,6 +85,13 @@ resource "aws_instance" "Master" {
   tags = {
     Name = "Master"
   }
+  user_data              = <<-EOF
+  #!/bin/bash
+  apt update -y
+  apt install software-properties-common -y
+  add-apt-repository --yes --update ppa:ansible/ansible
+  apt install ansible -y
+  EOF
 }
 
 # Create EC2 instances "Workers" in us-east-2a
