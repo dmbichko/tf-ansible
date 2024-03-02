@@ -60,11 +60,23 @@ resource "aws_main_route_table_association" "main" {
   route_table_id = aws_route_table.public_route_table.id
 }
 
+
+resource "tls_private_key" "tls-aws-key" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+# Create a private key for aws instances
+resource "aws_key_pair" "instance_key" {
+  key_name   = var.key_name
+  public_key = tls_private_key.tls-aws-key.public_key_openssh
+}
+
 # Create an EC2 instance to manage configurations in us-east-2a
 resource "aws_instance" "Master" {
   ami           = var.ami_id
   instance_type = var.instance_type 
-  key_name      = var.key_name
+  key_name      = aws_key_pair.instance_key.key_name
   subnet_id     = aws_subnet.public_subnet.id
 
   # Security group configuration allowing SSH access
@@ -80,7 +92,7 @@ resource "aws_instance" "Worker" {
   count         = var.instance_count
   ami           = var.ami_id
   instance_type = var.instance_type 
-  key_name      = var.key_name
+  key_name      = aws_key_pair.instance_key.key_name
   subnet_id     = aws_subnet.public_subnet.id
 
   # Security group configuration allowing SSH access
